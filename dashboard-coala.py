@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-import json
+import requests
 import unicodedata
 
 # Função para remover acentos
@@ -13,9 +13,12 @@ def remove_acentos(texto):
 # Configuração da página (deve ser a primeira função chamada)
 st.set_page_config(page_title="Dashboard de Vendas", layout="wide")
 
-# Carregando os dados do arquivo JSON
-with open('dados_lanchonete.json', 'r') as f:
-    data = json.load(f)
+# URL do arquivo JSON
+url = 'https://coalalanches.com.br/app/dados_lanchonete.json'
+
+# Carregando os dados do arquivo JSON a partir da URL
+response = requests.get(url)
+data = response.json()
 
 # Removendo acentos das chaves e valores no JSON
 data = {remove_acentos(k): [remove_acentos(item) for item in v] for k, v in data.items()}
@@ -100,3 +103,7 @@ for idx, graph in enumerate(selected_graphs):
     else:
         with col2:
             plot_graph(*graphs_dict[graph])
+
+# Exibindo a tabela de dados abaixo dos gráficos
+st.write("### Tabela de Dados Filtrados")
+st.dataframe(filtered_df)
